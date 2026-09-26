@@ -154,7 +154,9 @@ function bitcoinStatus(data,controls){
  if(!recordFresh(p.heartbeatNs,90)||!recordFresh(b.atNs,30))return state('BTC update delayed','Waiting for a current strategy check.');
  if(!controls.runtimeSupportsControls)return state('BTC update required','The running release does not support BTC controls.');
  if(controls.appliedRevision!==controls.revision)return state('Applying entry setting','Waiting for the trader to acknowledge the saved switch.');
- const sourceHold=/BRTI|BINANCE|PMUS_BOOK|EXTERNAL|METADATA|SOURCE|TERMS|CONTRACT|ROSTER/.test(whyKey);
+ // Weak or opposing observed signals are trading filters, not missing feeds.
+ const signalFilter=/^(EXTERNAL_(TRADE_FLOW_SUPPORT_TOO_LOW|MICROPRICE_SUPPORT_TOO_LOW|TRUTH_LEAD_TOO_(LOW|HIGH))|POLYMARKET_BOOK_MOMENTUM_TOO_LOW)$/.test(whyKey);
+ const sourceHold=!signalFilter&&/BRTI|BINANCE|PMUS_BOOK|EXTERNAL|METADATA|SOURCE|TERMS|CONTRACT|ROSTER|MISSING_.*BOOK|BOOK.*(MISSING|STALE|RETRY|PENDING)|STALE_BOOK|POLYMARKET_BOOK_LAG/.test(whyKey);
  const checked='Latest strategy check '+ageText(b.atNs)+'.';
  if(!controls.products?.btc||whyKey==='USER_PAUSED_BTC')return state('BTC entries paused','New BTC orders are disabled; existing positions remain monitored.',sourceHold?'Latest input check: '+plainReason(why):checked);
  if(['USER_PAUSED_NEW_ENTRIES','VERIFIED_UPDATE_NEW_ENTRIES_PAUSED'].includes(whyKey))return state('New entries paused',plainReason(why),checked);
@@ -164,8 +166,15 @@ function bitcoinStatus(data,controls){
  if(whyKey==='OUTSIDE_TABLE_TIME_WINDOW'){
   const endNs=Number(b.endNs),nowNs=Date.now()*1e6,remaining=(Number.isFinite(endNs)&&endNs>0)?(endNs-nowNs)/1e9:null;
   const remainingText=Number.isFinite(remaining)?` About ${Math.max(0,Math.round(remaining))} seconds remain.`:'';
-  return state('Final five-minute window open','The outer BTC window is open, but this researched route quotes only with 61–180 seconds remaining.'+remainingText,checked);
+  return state('Waiting for strategy window','Within the final five minutes, this route quotes only with 61–150 seconds remaining.'+remainingText,checked);
  }
+ if(whyKey==='ASK_OUTSIDE_SELECTED_TABLE'){
+  const input=b.decisionInputs||{},ask=Number(input.ask),side=['UP','DOWN'].includes(input.side)?input.side:'selected';
+  const price=input.ask!=null&&Number.isFinite(ask)?` The ${side} offer is ${(ask*100).toFixed(0)}¢.`:'';
+  return state('Waiting for an eligible price','The available price is outside this strategy’s entry range.'+price,checked);
+ }
+ if(whyKey==='QUEUE_AHEAD_TOO_HIGH')return state('Waiting for a less crowded quote','The orders ahead exceed this strategy’s queue limit.',checked);
+ if(signalFilter)return state('Waiting for signal confirmation',plainReason(why),'Live inputs are present; the latest signal does not meet the entry rules.');
  if(/MINIMUM|CAPACITY|KELLY|RISK|CASH|RESERVE|DRAWDOWN/.test(whyKey))return state('Waiting for BTC capacity',plainReason(why),'New orders must fit BTC’s allocation, Kelly size and exposure limits.');
  if(whyKey==='POST_ONLY_QUOTE_SUBMITTED')return state('Maker quote submitted','A post-only BTC quote was submitted; a fill is not yet implied.',checked,'good');
  if(b.status==='HOLD')return state('Watching · no new order',plainReason(why)||'No eligible entry on the latest check.',checked);
@@ -185,7 +194,7 @@ function renderProductDesk(data){
   let state=!supported?'Update required':!applied?'Applying setting':enabled?'Entries enabled':'Entries paused';
   if(!live&&supported)state='Service stopped · '+(enabled?'enabled when started':'paused');
   const btcReasonKey=String(btc.reason||'').toUpperCase();
-  const reason=isBTC?(recordFresh(btc.atNs,30)?({USER_PAUSED_BTC:'New BTC entries are paused.',OUTSIDE_LAST_FIVE_MINUTES:'Waiting for the final five-minute entry window.',OUTSIDE_TABLE_TIME_WINDOW:'Final five-minute window open · this route quotes only with 61–180 seconds remaining.',BTC_METADATA_PENDING:'Waiting for the next BTC contract.'}[btcReasonKey]||plainReason(btc.reason||btc.status||'Watching')):'Waiting for BTC runtime'):
+  const reason=isBTC?(recordFresh(btc.atNs,30)?({USER_PAUSED_BTC:'New BTC entries are paused.',OUTSIDE_LAST_FIVE_MINUTES:'Waiting for the final five-minute entry window.',OUTSIDE_TABLE_TIME_WINDOW:'Final five-minute window open · this route quotes only with 61–150 seconds remaining.',BTC_METADATA_PENDING:'Waiting for the next BTC contract.'}[btcReasonKey]||plainReason(btc.reason||btc.status||'Watching')):'Waiting for BTC runtime'):
     enabled?'Five city forecasts · current weather strategy':'New entries paused; existing positions stay monitored';
   const stat=(label,value)=>`<div><dt>${escapeHTML(label)}</dt><dd>${value==null?'—':escapeHTML(money(value))}</dd></div>`;
   const risk=data.productRisk?.products?.[id],modeLabel={COOLDOWN:'cooldown',RECOVERY:'recovery · limited re-entry',READY:'normal'}[risk?.brakeMode]||'unconfirmed';
