@@ -1,5 +1,5 @@
-# Weather Desk
+# Polymarket Trader
 
-Static dashboard UI only. Sign in to view live data and use the explicit Update trader action. Authentication is checked by the connected Mac. No accounts, credentials or trading records are published in this repository.
+One dashboard for Weather and Bitcoin traders. Sign in to view live data and use each trader's controls. Authentication is checked by the connected Mac. Only static interface files and the connection address are published here; accounts, credentials and trading records stay on the Mac.
 
-The Mac connects through a free Cloudflare Quick Tunnel. It has no uptime guarantee; this is a personal remote view, not an independent hosted trader.
+The Mac must stay awake and online. Its free Cloudflare Quick Tunnel is checked and replaced automatically if the connection expires.

@@ -1,9 +1,9 @@
 /* Public interface only. The password is sent over HTTPS to the Mac. */
 (()=>{
  'use strict';
- const originalFetch=window.fetch.bind(window), storageKey='weather-desk-session:'+location.pathname;
+ const originalFetch=window.fetch.bind(window), storageKey='polymarket-trader-session', legacyKeys=['weather-desk-session:'+location.pathname,'weather-desk-session:/weather-trader-dashboard/','weather-desk-session:/weather-trader-dashboard/index.html'];
  let token=null, endpoint=null, endpointAt=0, endpointPromise=null, endpointAttemptAt=0, loginBox=null;
- try{localStorage.removeItem('weather-desk-access:'+location.pathname);token=localStorage.getItem(storageKey);}catch{}
+ try{localStorage.removeItem('weather-desk-access:'+location.pathname);token=localStorage.getItem(storageKey)||legacyKeys.map(key=>localStorage.getItem(key)).find(Boolean);if(token)localStorage.setItem(storageKey,token);legacyKeys.forEach(key=>localStorage.removeItem(key));}catch{}
  if(new URLSearchParams(location.hash.slice(1)).has('access'))history.replaceState(null,'',location.pathname);
  window.EventSource=undefined;
  window.WeatherDeskRemote={requiresLogin:!token};
@@ -21,7 +21,7 @@
   try{return await endpointPromise;}catch(error){if(endpoint)return endpoint;throw error;}finally{endpointPromise=null;}
  }
  function lock(){
-  token=null;try{localStorage.removeItem(storageKey);}catch{}
+  token=null;try{localStorage.removeItem(storageKey);legacyKeys.forEach(key=>localStorage.removeItem(key));}catch{}
   window.WeatherDeskRemote.requiresLogin=true;
   document.body.classList.add('remote-locked');if(loginBox)loginBox.hidden=false;
  }
