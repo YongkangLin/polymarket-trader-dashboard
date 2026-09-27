@@ -8,13 +8,17 @@
    const product=state?.products?.[id],current=product||state;
    const installed=['CURRENT','INSTALLED'].includes(current?.state),version=String(current?.releaseId||'').match(/-r(\d+)(?:-|$)/)?.[1];
    const available=!!current?.canUpdate&&!error;
-   const requestRunning=busy||state?.requestRunning;
+   const requestRunning=(busy&&target?.product===id)||(state?.requestRunning&&state?.requestProduct===id);
+   const anotherRequest=(busy&&target?.product!==id)||(state?.requestRunning&&state?.requestProduct!==id);
    const pending=!requestRunning&&current?.state==='APPLYING';
-   button.disabled=!available||requestRunning||pending||reviewing;
+   button.disabled=!available||requestRunning||anotherRequest||pending||reviewing;
+   // Shared-account controls appear only for an actual shared update/failure.
+   // Each product always retains its own update button and status.
+   box.hidden=id==='account'&&!available&&!requestRunning&&!pending&&current?.state!=='ERROR';
    button.textContent=requestRunning?'Updating…':pending?'Update pending':available?'Update '+names[id]+(version?' · r'+version:''):installed?names[id]+' up to date':state?'Update unavailable':'Checking update…';
    button.title=current?.summary||'';
    box.dataset.state=available?'available':installed?'current':'waiting';
-   note.textContent=error|| (available&&current?.activationScope==='SHARED_ACCOUNT'?'Shared account update. Review the affected components before applying.':current?.state==='REBUILD_REQUIRED'?current.summary:requestRunning?'Waiting for the selected release to be adopted.':pending?'The release is published and waiting for the trader to adopt it.':current?.state==='INSTALLED'?'Installed. See trader status above.':'');
+   note.textContent=error|| (available&&current?.activationScope==='SHARED_ACCOUNT'?'Shared account update. Review the affected components before applying.':['REBUILD_REQUIRED','COMPATIBILITY_REQUIRED'].includes(current?.state)?current.summary:requestRunning?'Preparing this product update.':anotherRequest&&available?'Another update is finishing; this update remains available.':pending?'This product is waiting for the trader to load it.':current?.state==='INSTALLED'?'Installed. See trader status above.':'');
   });
  }
  async function refresh(){
@@ -26,7 +30,7 @@
    if(!response.ok)throw Error();state=await response.json();error='';
    const selected=target?state.products?.[target.product]:null;
    if(target&&['CURRENT','INSTALLED'].includes(selected?.state)&&selected.releaseId===target.releaseId){target=null;busy=false;}
-   if(target&&(selected?.state==='ERROR'||selected?.state==='REBUILD_REQUIRED'||(state.requestExit!=null&&state.requestExit!==0))){busy=false;target=null;error='Update failed. Refresh and retry.';}
+   if(target&&(['ERROR','REBUILD_REQUIRED','COMPATIBILITY_REQUIRED'].includes(selected?.state)||(state.requestExit!=null&&state.requestExit!==0))){busy=false;target=null;error='Update failed. Refresh and retry.';}
   }catch{error=window.WeatherDeskRemote?.requiresLogin?'Sign in to check updates.':'Reconnecting to your Mac for update status…';}
   finally{clearTimeout(timeout);inFlight=false;render();}
  }
@@ -38,7 +42,7 @@
   const version=String(product.releaseId||'').match(/-r(\d+)(?:-|$)/)?.[1];
   const title='Update '+names[id]+(version?' to r'+version:'')+'?';
   const notes=releaseNotes(product);
-  const scope=product.activationScope==='SHARED_ACCOUNT'?'This changes the shared account layer. See the release notes for any product changes.':'Only this product component changes. The shared trader may briefly restart to load the verified release.';
+  const scope=product.activationScope==='SHARED_ACCOUNT'?'This changes the shared account layer. See the release notes for any product changes.':'Updates '+names[id]+' and keeps the other trader’s installed version. Your saved capital and risk settings stay in effect.';
   const modal=document.createElement('dialog');
   if(typeof modal.showModal!=='function')return confirm(title+'\n\n'+notes.map(x=>'• '+x).join('\n')+'\n\n'+scope+'\nThis may start or restart trading.');
   modal.className='release-review';modal.setAttribute('aria-labelledby','release-review-title');
