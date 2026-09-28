@@ -13,10 +13,10 @@
    const pending=!requestRunning&&current?.state==='APPLYING';
    button.disabled=!available||requestRunning||anotherRequest||pending||reviewing;
    box.hidden=false;
-   button.textContent=requestRunning?'Updating…':pending?'Update pending':available?'Update '+names[id]+(version?' · r'+version:''):installed?names[id]+' up to date':current?.state==='REBUILD_REQUIRED'?names[id]+' update needs refresh':state?'Update unavailable':'Checking update…';
+   button.textContent=requestRunning?'Updating…':pending?'Update pending':available?'Update '+names[id]+(version?' · r'+version:''):installed?names[id]+' up to date':current?.state==='REBUILD_REQUIRED'?'Weather update is out of date':state?'Update unavailable':'Checking update…';
    button.title=current?.summary||'';
    box.dataset.state=available?'available':installed?'current':'waiting';
-   note.textContent=error|| (available&&current?.activationScope==='SHARED_ACCOUNT'?'Shared account update. Review the affected components before applying.':current?.state==='REBUILD_REQUIRED'?'This update is older than the Weather version installed, so it cannot be applied. A current Weather update must be prepared.':['REBUILD_REQUIRED','COMPATIBILITY_REQUIRED'].includes(current?.state)?current.summary:requestRunning?'Preparing this product update.':anotherRequest&&available?'Another update is finishing; this update remains available.':pending?'This product is waiting for the trader to load it.':current?.state==='INSTALLED'?'Installed. See trader status above.':'');
+   note.textContent=error|| (available&&current?.activationScope==='SHARED_ACCOUNT'?'Shared account update. Review the affected components before applying.':current?.state==='REBUILD_REQUIRED'?'This update was made for an older version, so it cannot be installed. A current Weather update must be prepared.':['REBUILD_REQUIRED','COMPATIBILITY_REQUIRED'].includes(current?.state)?current.summary:requestRunning?'Preparing this product update.':anotherRequest&&available?'Another update is finishing; this update remains available.':pending?'This product is waiting for the trader to load it.':current?.state==='INSTALLED'?'Installed. See trader status above.':'');
   });
  }
  async function refresh(){

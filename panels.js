@@ -225,7 +225,7 @@ function renderProductDesk(data){
  const service=document.getElementById('trader-service');
  if(traderServiceState){
   service.disabled=productBusy||traderServiceState.starting;
-  service.textContent=traderServiceState.starting?'Starting…':traderServiceState.running?'Stop service':'Start service';
+  service.textContent=traderServiceState.starting?'Starting…':traderServiceState.running?'Stop trader':'Start trader';
   service.title=traderServiceState.startError||'';
  }
 }
