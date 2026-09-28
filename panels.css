@@ -253,5 +253,5 @@ button:disabled { cursor: default; }
 .allocation-form{margin:16px 0 0;padding-top:16px;border-top:1px solid var(--line);display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px 16px;align-items:center}.allocation-heading{grid-column:1/-1;display:flex;justify-content:space-between;gap:12px;font-size:13px}.allocation-heading label{font-weight:650}.allocation-heading output{color:var(--muted)}#weather-allocation{width:100%;accent-color:#4263eb;cursor:pointer}#allocation-save{padding:9px 14px;border:1px solid #dce3ee;border-radius:8px;background:white;color:#4263eb;cursor:pointer}#allocation-save:disabled{opacity:.5;cursor:default}#allocation-status{grid-column:1/-1;margin:0;font-size:12px;color:var(--muted)}
 
 /* Product updates stay visible while account panels are loading. */
-.product-update-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin:0 0 18px}.product-update-grid .product-update{margin-top:0}.product-update[hidden]{display:none}
-@media(max-width:420px){.product-update-grid{grid-template-columns:1fr;gap:8px}}
+.product-update-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin:0 0 18px}.product-update-grid .product-update{margin-top:0}.product-update[hidden]{display:none}
+@media(max-width:620px){.product-update-grid{grid-template-columns:1fr;gap:8px}}

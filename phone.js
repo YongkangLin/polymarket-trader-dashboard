@@ -12,10 +12,8 @@
    const anotherRequest=(busy&&target?.product!==id)||(state?.requestRunning&&state?.requestProduct!==id);
    const pending=!requestRunning&&current?.state==='APPLYING';
    button.disabled=!available||requestRunning||anotherRequest||pending||reviewing;
-   // Shared-account controls appear only for an actual shared update/failure.
-   // Each product always retains its own update button and status.
-   box.hidden=id==='account'&&!available&&!requestRunning&&!pending&&current?.state!=='ERROR';
-   button.textContent=requestRunning?'Updating…':pending?'Update pending':available?'Update '+names[id]+(version?' · r'+version:''):installed?names[id]+' up to date':state?'Update unavailable':'Checking update…';
+   box.hidden=false;
+   button.textContent=requestRunning?'Updating…':pending?'Update pending':available?'Update '+names[id]+(version?' · r'+version:''):installed?names[id]+' up to date':current?.state==='REBUILD_REQUIRED'?names[id]+' update needs rebuilding':state?'Update unavailable':'Checking update…';
    button.title=current?.summary||'';
    box.dataset.state=available?'available':installed?'current':'waiting';
    note.textContent=error|| (available&&current?.activationScope==='SHARED_ACCOUNT'?'Shared account update. Review the affected components before applying.':['REBUILD_REQUIRED','COMPATIBILITY_REQUIRED'].includes(current?.state)?current.summary:requestRunning?'Preparing this product update.':anotherRequest&&available?'Another update is finishing; this update remains available.':pending?'This product is waiting for the trader to load it.':current?.state==='INSTALLED'?'Installed. See trader status above.':'');
