@@ -234,15 +234,19 @@ function renderProductDesk(data){
  window.dispatchEvent(new Event('product-cards-rendered'));
  el.querySelectorAll('.product-toggle').forEach(button=>button.addEventListener('click',()=>setProduct(button.dataset.product)));
  const message=document.getElementById('product-message');
- if(!productBusy)message.textContent=traderServiceState?.startError?
-  `Start failed: ${traderServiceState.startError}`:
-  traderServiceState?.starting?'Starting the trading service…':
+ // Running takes precedence even while an older gateway reports its durable
+ // supervisor as a pending start request.
+ const running=!!traderServiceState?.running,starting=!!traderServiceState?.starting&&!running;
+ const startError=running?null:traderServiceState?.startError;
+ if(!productBusy)message.textContent=startError?
+  `Start failed: ${startError}`:
+  starting?'Starting the trading service…':
   !supported?'Install the available update to control both traders. BTC starts paused.':'Enabling permits real trades after account, source and risk checks. Pausing stops new submissions; resting quotes can fill until expiry. Positions continue to reconcile.';
  const service=document.getElementById('trader-service');
  if(traderServiceState){
-  service.disabled=productBusy||traderServiceState.starting;
-  service.textContent=traderServiceState.starting?'Starting…':traderServiceState.running?'Stop trader':'Start trader';
-  service.title=traderServiceState.startError||'';
+  service.disabled=productBusy||starting;
+  service.textContent=running?'Stop trader':starting?'Starting…':'Start trader';
+  service.title=startError||'';
  }
 }
 let productPollInFlight=false;
