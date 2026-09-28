@@ -140,7 +140,18 @@ function btcProbabilityBlock(btc){
  const p=btc?.probability||{},value=Number(p.upProbability),fresh=recordFresh(btc?.atNs,5);
  const probability=Number.isFinite(value)&&value>=0&&value<=1?`${(value*100).toFixed(2)}% up`:'Unavailable';
  const model=p.model||'Model unavailable';
- return `<div class="btc-live-model" aria-label="Live BTC model probability"><div><span>Live model</span><strong>${escapeHTML(probability)}</strong></div><div><span>${escapeHTML(model)}</span><small>${fresh?'Updated '+ageText(btc.atNs):'Stale / waiting for update'}</small></div></div>`;
+ return `<div class="btc-live-model" aria-label="Live BTC model probability"><div><span>${btc?.horizons?'15M model':'Live model'}</span><strong>${escapeHTML(probability)}</strong></div><div><span>${escapeHTML(model)}</span><small>${fresh?'Updated '+ageText(btc.atNs):'Stale / waiting for update'}</small></div></div>`;
+}
+function btcHorizonBlock(btc){
+ if(!btc?.horizons)return '';
+ const rows=['15m','1h'].map(h=>{
+  const v=btc.horizons[h]||{},fresh=recordFresh(v.atNs,5);
+  const reason=fresh?plainReason(v.reason||v.status||'Waiting'):'Waiting for a current check';
+  const target=v.priceToBeat==null?'Target pending':'Target '+money(v.priceToBeat);
+  const window=h==='1h'?'Entries in the final 15 minutes':'Entries from data-ready open';
+  return `<div class="btc-live-model"><div><span>${h==='1h'?'1H':'15M'}</span><strong>${escapeHTML(reason)}</strong></div><div><span>${escapeHTML(target)}</span><small>${escapeHTML(window)} · stops 61s before close</small></div></div>`;
+ });
+ return `<section aria-label="BTC market horizons">${rows.join('')}</section>`;
 }
 function bitcoinStatus(data,controls){
  const p=data.process||{},b=data.btc||{},risk=data.productRisk?.products?.btc,why=String(b.reason||''),whyKey=why.toUpperCase();
@@ -161,6 +172,11 @@ function bitcoinStatus(data,controls){
  if(!controls.products?.btc||whyKey==='USER_PAUSED_BTC')return state('BTC entries paused','New BTC orders are disabled; existing positions remain monitored.',sourceHold?'Latest input check: '+plainReason(why):checked);
  if(['USER_PAUSED_NEW_ENTRIES','VERIFIED_UPDATE_NEW_ENTRIES_PAUSED'].includes(whyKey))return state('New entries paused',plainReason(why),checked);
  if(risk&&recordFresh(risk.atNs,90)&&risk.reason)return state('BTC risk hold',riskPauseReason(risk.reason),'BTC uses its own risk limits.','alert');
+ if(b.horizons){
+  const submitted=Object.entries(b.horizons).filter(([h,v])=>recordFresh(v?.atNs,5)&&/^(POST_ONLY_QUOTE_SUBMITTED|CAPPED_IOC_SUBMITTED)$/.test(v.reason||''));
+  if(submitted.length)return state('BTC order submitted',submitted.map(([h])=>h==='1h'?'1H':'15M').join(' and ')+' order submitted; a fill is not yet implied.',checked,'good');
+  return state('Watching 15M and 1H','Each horizon has its own source, price and entry checks. See the current results below.',checked);
+ }
  if(sourceHold)return state('Waiting for BTC inputs',plainReason(why),'New entries wait for fresh BRTI, Binance and PMUS books.');
  if(whyKey==='OUTSIDE_LAST_FIVE_MINUTES')return state('Waiting for entry window','BTC trades only in the final five minutes of each 15-minute contract.',checked);
  if(whyKey==='OUTSIDE_TABLE_TIME_WINDOW'){
@@ -206,12 +222,12 @@ function renderProductDesk(data){
   const metrics=`<dl class="product-metrics">${stat(pnlLabel,pnl)}${stat(a?.feeStatus==='KNOWN_ONLY'?'Known fees / rebates':'Fees / rebates',a?.feesUSD)}${stat('Open exposure',a?.openExposureUSD)}</dl>`;
   const pnlNote=a?`${confirmed} confirmed market${confirmed===1?'':'s'} · ${a.openMarkets||0} open · ${a.settlementPendingMarkets||0} awaiting settlement reconciliation. Fees are included in confirmed results; open positions are excluded.`:'Accounting records unavailable.';
   const date=ns=>new Date(Number(ns)/1e6).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
-  const windowText=isBTC&&recordFresh(btc.atNs,30)&&btc.endNs?`Entry ${date(btc.entryStartsNs)}–${date(btc.endNs)} · original target ${money(btc.priceToBeat)}`:isBTC?'PMUS 15-minute contracts · entries in final 5 minutes':'Miami · Los Angeles · San Francisco · Chicago · New York';
+  const windowText=isBTC&&recordFresh(btc.atNs,30)&&btc.endNs?`Entry ${date(btc.entryStartsNs)}–${date(btc.entryEndsNs||Number(btc.endNs)-61e9)} · 15M target ${money(btc.priceToBeat)}`:isBTC?'PMUS BTC contracts · positive-value entries with shared Kelly limits':'Miami · Los Angeles · San Francisco · Chicago · New York';
   const positions=(a?.positions||[]).map(p=>`<li><span title="${escapeHTML(p.marketSlug)}">${escapeHTML(p.marketSlug)}</span><strong>${escapeHTML(p.side)} · ${escapeHTML(p.quantity)} · ${money(p.costUSD)}</strong></li>`).join('');
   const orders=(a?.orders||[]).slice(-10).reverse().map(o=>`<li><span title="${escapeHTML(o.marketSlug)}">${escapeHTML(o.marketSlug)}</span><strong>${escapeHTML(o.status||'Unknown')}</strong></li>`).join('');
   const w=isBTC?bitcoinStatus(data,controls):(data.weatherStatus||{});
   const countdown=isBTC?`<p class="btc-status-countdown" data-btc-countdown data-entry-starts-ns="${escapeHTML(btc.entryStartsNs||'')}" data-end-ns="${escapeHTML(btc.endNs||'')}">${escapeHTML(btcCountdownText(btc.entryStartsNs,btc.endNs))}</p>`:'';
-  const statusBlock=`<section class="product-trader-status" data-tone="${escapeHTML(w.tone||'waiting')}" aria-label="${title} status"><span class="status-kicker"><span class="status-dot"></span>${title} status</span><h4>${escapeHTML(w.title||'Checking trader…')}</h4>${countdown}${isBTC?btcProbabilityBlock(btc):''}<p>${escapeHTML(w.reason||reason)}</p>${w.next?`<p class="trader-status-next">${escapeHTML(w.next)}</p>`:''}</section>`;
+  const statusBlock=`<section class="product-trader-status" data-tone="${escapeHTML(w.tone||'waiting')}" aria-label="${title} status"><span class="status-kicker"><span class="status-dot"></span>${title} status</span><h4>${escapeHTML(w.title||'Checking trader…')}</h4>${countdown}${isBTC?btcProbabilityBlock(btc)+btcHorizonBlock(btc):''}<p>${escapeHTML(w.reason||reason)}</p>${w.next?`<p class="trader-status-next">${escapeHTML(w.next)}</p>`:''}</section>`;
   return `<article class="product-card" data-product="${id}"><div class="product-card-head"><div><span class="product-symbol">${isBTC?'₿':'☀'}</span><h3>${title}</h3></div><span class="product-pill ${enabled&&applied&&live?'on':''}">${escapeHTML(state)}</span></div><p class="product-scope">${escapeHTML(windowText)}</p>${metrics}<p class="product-pnl-note">${escapeHTML(pnlNote)}</p>${riskText}${statusBlock}<button type="button" class="product-toggle ${enabled?'pause':'enable'}" data-product="${id}" ${!supported||productBusy?'disabled':''}>${enabled?'Pause '+title+' entries':'Enable '+title+' entries'}</button><details data-product="${id}" ${opened.has(id)?'open':''}><summary>${a?.orderCount??'—'} orders · ${a?.positions?.length??'—'} open positions${partial?' · '+a.pendingMarkets+' P&L pending':''}</summary><h4>Positions</h4><ul>${positions||'<li>No recorded open positions</li>'}</ul><h4>Recent orders</h4><ul>${orders||'<li>No recorded orders</li>'}</ul><p>${a?.accountingStatus==='INCOMPLETE_HISTORY'?'Some historical fills lack complete evidence. Only known amounts are shown.':'P&L uses owned fills, actual fees and matched settlement receipts.'}</p></details></article>`;
  }).join('');
  tickBtcCountdown();
@@ -239,6 +255,9 @@ async function refreshBtcStatus(){
   if(!response.ok)throw Error('BTC status unavailable');
   const btc=await response.json();
   if(!productLatest)return;
+  // Older running dashboards omit horizon fields from the compact endpoint.
+  // Keep the full snapshot's original clocks; stale rows remain visibly stale.
+  if(!btc.horizons&&productLatest.btc?.horizons)btc.horizons=productLatest.btc.horizons;
   productLatest={...productLatest,btc};
   renderProductDesk(productLatest);
  }catch{}
@@ -297,8 +316,9 @@ function btcPriceChart(chart){
  const clock=t=>new Date(t*1000).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
  let path='',last=null;
  for(const [t,p]of pts){path+=(last===null||t-last!==1?'M':'L')+x(t).toFixed(2)+','+y(Number(p)).toFixed(2)+' ';last=t;}
- const entry=Number(chart.entryStartsNs)/1e9,fresh=chart.fresh&&recordFresh(chart.latestPriceNs,5),latest=Number(pts[pts.length-1][1]),delta=latest-target;
- return `<section class="btc-chart" aria-label="Bitcoin price movement"><div class="btc-chart-heading"><h2>Bitcoin · 15-minute price movement</h2><span class="${fresh?'':'btc-stale'}">${fresh?'Live · refreshes every second':'Delayed / reconnecting'}</span></div><div class="btc-chart-price">${escapeHTML(price(latest))}<small>${delta>=0?'+':''}${escapeHTML(price(delta))} vs target</small></div><svg viewBox="0 0 640 218" role="img" aria-label="BTC BRTI price over the current fifteen-minute contract, original target dashed, final five minutes shaded"><rect x="${x(entry)}" y="16" width="${x(end)-x(entry)}" height="163" fill="#e3ac5010"/><text x="${x(entry)+7}" y="12" class="btc-window-label">Final 5 min</text>${[ymin,(ymin+ymax)/2,ymax].map(v=>`<line x1="12" x2="532" y1="${y(v)}" y2="${y(v)}" class="btc-grid"/><text x="542" y="${y(v)+4}">${escapeHTML(price(v))}</text>`).join('')}<line x1="12" x2="532" y1="${y(target)}" y2="${y(target)}" class="btc-target"/><path d="${path}" class="btc-series"/><circle cx="${x(pts[pts.length-1][0])}" cy="${y(latest)}" r="3" fill="#e4b76c"/>${[start,start+450,end].map((t,i)=>`<text x="${x(t)}" y="205" text-anchor="${i===0?'start':i===2?'end':'middle'}">${escapeHTML(clock(t))}</text>`).join('')}</svg><div class="btc-chart-legend"><span>— BRTI / USD</span><span>╌ Original target ${escapeHTML(price(target))}</span></div><p>Last tick ${escapeHTML(ageText(chart.latestPriceNs))} · rolling 60-second average ${chart.rollingAverageUSD==null?'unavailable':escapeHTML(money(chart.rollingAverageUSD))}. Settlement uses the closing 60-second average; the line shows individual index prices.</p>${chart.missingSeconds?`<p>${chart.missingSeconds} seconds without a qualified observation; gaps remain visible.</p>`:''}</section>`;
+ const liveWindow=productLatest?.btc?.slug===chart.marketSlug?productLatest.btc:null;
+ const entry=Number(liveWindow?.entryStartsNs||chart.entryStartsNs)/1e9,entryEnd=Math.min(end,Number(liveWindow?.entryEndsNs||chart.endNs)/1e9),fresh=chart.fresh&&recordFresh(chart.latestPriceNs,5),latest=Number(pts[pts.length-1][1]),delta=latest-target;
+ return `<section class="btc-chart" aria-label="Bitcoin price movement"><div class="btc-chart-heading"><h2>Bitcoin · 15-minute price movement</h2><span class="${fresh?'':'btc-stale'}">${fresh?'Live · refreshes every second':'Delayed / reconnecting'}</span></div><div class="btc-chart-price">${escapeHTML(price(latest))}<small>${delta>=0?'+':''}${escapeHTML(price(delta))} vs target</small></div><svg viewBox="0 0 640 218" role="img" aria-label="BTC BRTI price over the current fifteen-minute contract, original target dashed, entry window shaded"><rect x="${x(entry)}" y="16" width="${x(entryEnd)-x(entry)}" height="163" fill="#e3ac5010"/><text x="${x(entry)+7}" y="12" class="btc-window-label">Entry window</text>${[ymin,(ymin+ymax)/2,ymax].map(v=>`<line x1="12" x2="532" y1="${y(v)}" y2="${y(v)}" class="btc-grid"/><text x="542" y="${y(v)+4}">${escapeHTML(price(v))}</text>`).join('')}<line x1="12" x2="532" y1="${y(target)}" y2="${y(target)}" class="btc-target"/><path d="${path}" class="btc-series"/><circle cx="${x(pts[pts.length-1][0])}" cy="${y(latest)}" r="3" fill="#e4b76c"/>${[start,start+450,end].map((t,i)=>`<text x="${x(t)}" y="205" text-anchor="${i===0?'start':i===2?'end':'middle'}">${escapeHTML(clock(t))}</text>`).join('')}</svg><div class="btc-chart-legend"><span>— BRTI / USD</span><span>╌ Original target ${escapeHTML(price(target))}</span></div><p>Last tick ${escapeHTML(ageText(chart.latestPriceNs))} · rolling 60-second average ${chart.rollingAverageUSD==null?'unavailable':escapeHTML(money(chart.rollingAverageUSD))}. Settlement uses the closing 60-second average; the line shows individual index prices.</p>${chart.missingSeconds?`<p>${chart.missingSeconds} seconds without a qualified observation; gaps remain visible.</p>`:''}</section>`;
 }
 
 // Persist only an explicit Save. Polling never overwrites an unsaved slider edit.
