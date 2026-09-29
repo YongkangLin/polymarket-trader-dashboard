@@ -237,15 +237,18 @@ function renderProductDesk(data){
  // Running takes precedence even while an older gateway reports its durable
  // supervisor as a pending start request.
  const running=!!traderServiceState?.running,starting=!!traderServiceState?.starting&&!running;
- const startError=running?null:traderServiceState?.startError;
- if(!productBusy)message.textContent=startError?
+ const supervised=!!traderServiceState?.supervised,recovering=!running&&!!traderServiceState?.recovering;
+ const accountHold=!running&&!!traderServiceState?.accountHold;
+ const startError=running||supervised?null:traderServiceState?.startError;
+ if(!productBusy)message.textContent=recovering?'Restarting automatically after an error…':
+  accountHold?'Automatic restart is waiting for account reconciliation.':startError?
   `Start failed: ${startError}`:
   starting?'Starting the trading service…':
   !supported?'Install the available update to control both traders. BTC starts paused.':'Enabling permits real trades after account, source and risk checks. Pausing stops new submissions; resting quotes can fill until expiry. Positions continue to reconcile.';
  const service=document.getElementById('trader-service');
  if(traderServiceState){
-  service.disabled=productBusy||starting;
-  service.textContent=running?'Stop trader':starting?'Starting…':'Start trader';
+  service.disabled=productBusy||(starting&&!supervised);
+  service.textContent=running||supervised?'Stop trader':starting?'Starting…':'Start trader';
   service.title=startError||'';
  }
 }
@@ -295,7 +298,7 @@ async function setProduct(product){
 function initializeProductControls(){
  document.getElementById('trader-service')?.addEventListener('click',async()=>{
   if(productBusy||!traderServiceState)return;
-  const action=traderServiceState.running?'stop':'start';
+  const action=traderServiceState.running||traderServiceState.supervised?'stop':'start';
   if(!confirm(action==='start'?'Start the installed release? Enabled traders may place real-money orders.':'Stop the trading service? Open positions stay in your account.'))return;
   productBusy=true;if(productLatest)renderProductDesk(productLatest);
   try{
