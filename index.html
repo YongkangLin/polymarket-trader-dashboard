@@ -603,5 +603,33 @@ setInterval(tickLiveClock,1000);
 setInterval(tickBtcCountdown,250);
 window.addEventListener('pagehide',()=>statusStream?.close());
 </script>
+<script id="weather-research-note">
+(()=>{
+ function renderWeatherResearch(){
+  const card=document.querySelector('.product-card[data-product="weather"]');
+  if(!card)return;
+  card.querySelector('[data-weather-research]')?.remove();
+  const value=typeof productLatest==='undefined'?null:productLatest?.weatherResearch;
+  if(!value||typeof value.summary!=='string')return;
+  const note=document.createElement('section');
+  note.className='product-trader-status';
+  note.setAttribute('data-weather-research','');
+  note.setAttribute('aria-label','Weather research');
+  const heading=document.createElement('h4');
+  heading.textContent='Research · not profit-qualified';
+  note.appendChild(heading);
+  const paragraph=text=>{const element=document.createElement('p');element.textContent=text;note.appendChild(element)};
+  paragraph(value.summary);
+  if(value.status==='WITHHELD_NO_INITIAL_PURCHASE_CHANGE'){
+   paragraph(`${value.contexts} historical contexts · ${value.nominationChanges} plan-label changes · ${value.initialPurchaseChanges} changed initial purchases. Incremental P&L remains unknown.`);
+   if(typeof value.nextAction==='string')paragraph('Next: '+value.nextAction);
+   if(typeof value.asOfUtc==='string')paragraph('Checked research snapshot: '+value.asOfUtc);
+  }
+  card.appendChild(note);
+ }
+ window.addEventListener('product-cards-rendered',renderWeatherResearch);
+ renderWeatherResearch();
+})();
+</script>
 <script src="./phone.js?v=2baa089a96f8114f"></script></body>
 </html>
