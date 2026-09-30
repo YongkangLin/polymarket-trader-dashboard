@@ -641,10 +641,10 @@ window.addEventListener('pagehide',()=>statusStream?.close());
   const latest=typeof productLatest==='undefined'?null:productLatest;
   const process=latest?.process||{},btc=latest?.btc||{};
   const fresh=(clock,seconds)=>{const age=Date.now()-Number(clock)/1e6;return Number.isFinite(age)&&age>=0&&age<=seconds*1000};
-  const installed=process.running===true&&process.status==='RUNNING'&&fresh(process.heartbeatNs,90)&&fresh(btc.atNs,30)&&/(^|-)81b6c3d3be69(-|$)/.test(String(process.release||''));
+  const installed=process.running===true&&process.status==='RUNNING'&&fresh(process.heartbeatNs,90)&&fresh(btc.atNs,30)&&/(^|-)(81b6c3d3be69|1f48da8529fe)(-|$)/.test(String(process.release||''));
   const now=Date.now(),first=1790758800000,last=1791590400000;
   const title=!installed?'BTC maker-price trial · adoption unconfirmed':now<first?'BTC maker-price trial · installed, starts September 30 at 09:00 UTC':now>=last?'BTC maker-price trial · expired':'BTC maker-price trial · active';
-  note.textContent=title+'. Eligible closing-hour blocks compare the existing selector with joining the bid or improving it by one tick. Same-side quotes retain existing value checks and cannot exceed incumbent quantity, cost or first-purchase allowance; sales do not reset it. Taker, hybrid and exit rules remain unchanged. The experiment expires October 10 at 00:00 UTC. Probability calibration keeps its October 8–10 schedule. Auxiliary research recording has a storage gap; native order accounting is separate. Compare whole-market net dollars, nonfills, fees, credited rebates and unresolved exposure. Improved realized profitability is not established.';
+  note.textContent=title+'. Eligible closing-hour blocks compare the existing selector with joining the bid or improving it by one tick. Same-side quotes retain existing value checks and cannot exceed incumbent quantity, cost or first-purchase allowance; sales do not reset it. Taker, hybrid and exit rules remain unchanged. The experiment expires October 10 at 00:00 UTC. Probability calibration keeps its October 8–10 schedule. A September 30 repair restored auxiliary research recording. The full execution log and decision-context tape still have gaps; missing history is not recovered. Native order accounting is separate. Compare whole-market net dollars, nonfills, fees, credited rebates and unresolved exposure. Improved realized profitability is not established.';
  }
  window.addEventListener('product-cards-rendered',renderBtcValueTrial);
  renderBtcValueTrial();
