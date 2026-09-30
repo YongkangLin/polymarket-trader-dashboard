@@ -637,13 +637,13 @@ window.addEventListener('pagehide',()=>statusStream?.close());
   const card=document.querySelector('.product-card[data-product="btc"]');
   if(!card)return;
   let note=card.querySelector('[data-btc-value-trial]');
-  if(!note){note=document.createElement('section');note.setAttribute('data-btc-value-trial','v29');note.className='product-pnl-note';card.appendChild(note)}
+  if(!note){note=document.createElement('section');note.setAttribute('data-btc-value-trial','v30');note.className='product-pnl-note';card.appendChild(note)}
   const latest=typeof productLatest==='undefined'?null:productLatest;
   const process=latest?.process||{},btc=latest?.btc||{};
   const fresh=(clock,seconds)=>{const age=Date.now()-Number(clock)/1e6;return Number.isFinite(age)&&age>=0&&age<=seconds*1000};
-  const active=process.running===true&&process.status==='RUNNING'&&fresh(process.heartbeatNs,90)&&fresh(btc.atNs,30)&&/(^|-)03f300eacb8b(-|$)/.test(String(process.release||''));
-  const title=active?'BTC entry-budget trial · active':'BTC entry-budget trial · adoption unconfirmed';
-  note.textContent=title+'. New contracts keep their first-purchase allowance across maker, taker and hybrid orders; sales do not reset it. Probability calibration is unchanged. Improved realized profitability is not established.';
+  const active=process.running===true&&process.status==='RUNNING'&&fresh(process.heartbeatNs,90)&&fresh(btc.atNs,30)&&/(^|-)3dc12870b0a0(-|$)/.test(String(process.release||''));
+  const title=active?'BTC hybrid-budget trial · active':'BTC hybrid-budget trial · adoption unconfirmed';
+  note.textContent=title+'. New contracts keep their first-purchase allowance across maker, taker and hybrid orders; sales do not reset it. Hybrid route estimates account for cash left after the first fill. Probability calibration is unchanged. Improved realized profitability is not established.';
  }
  window.addEventListener('product-cards-rendered',renderBtcValueTrial);
  renderBtcValueTrial();
