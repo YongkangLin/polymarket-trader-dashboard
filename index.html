@@ -631,5 +631,23 @@ window.addEventListener('pagehide',()=>statusStream?.close());
  renderWeatherResearch();
 })();
 </script>
+<script id="btc-value-trial-note">
+(()=>{
+ function renderBtcValueTrial(){
+  const card=document.querySelector('.product-card[data-product="btc"]');
+  if(!card)return;
+  let note=card.querySelector('[data-btc-value-trial]');
+  if(!note){note=document.createElement('section');note.setAttribute('data-btc-value-trial','v28');note.className='product-pnl-note';card.appendChild(note)}
+  const latest=typeof productLatest==='undefined'?null:productLatest;
+  const process=latest?.process||{},btc=latest?.btc||{};
+  const fresh=(clock,seconds)=>{const age=Date.now()-Number(clock)/1e6;return Number.isFinite(age)&&age>=0&&age<=seconds*1000};
+  const active=process.running===true&&process.status==='RUNNING'&&fresh(process.heartbeatNs,90)&&fresh(btc.atNs,30)&&/(^|-)c1f9850c5f7f(-|$)/.test(String(process.release||''));
+  const title=active?'BTC v28 value trial · active':'BTC v28 value trial · adoption unconfirmed';
+  note.textContent=title+'. Known nonpositive after-cost value blocks the exact current order; unknown-cohort fallback stays explicit. A hybrid first IOC must have positive standalone value. Improved realized profitability is not established.';
+ }
+ window.addEventListener('product-cards-rendered',renderBtcValueTrial);
+ renderBtcValueTrial();
+})();
+</script>
 <script src="./phone.js?v=2baa089a96f8114f"></script></body>
 </html>
