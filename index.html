@@ -637,13 +637,14 @@ window.addEventListener('pagehide',()=>statusStream?.close());
   const card=document.querySelector('.product-card[data-product="btc"]');
   if(!card)return;
   let note=card.querySelector('[data-btc-value-trial]');
-  if(!note){note=document.createElement('section');note.setAttribute('data-btc-value-trial','v30');note.className='product-pnl-note';card.appendChild(note)}
+  if(!note){note=document.createElement('section');note.setAttribute('data-btc-value-trial','v31');note.className='product-pnl-note';card.appendChild(note)}
   const latest=typeof productLatest==='undefined'?null:productLatest;
   const process=latest?.process||{},btc=latest?.btc||{};
   const fresh=(clock,seconds)=>{const age=Date.now()-Number(clock)/1e6;return Number.isFinite(age)&&age>=0&&age<=seconds*1000};
-  const active=process.running===true&&process.status==='RUNNING'&&fresh(process.heartbeatNs,90)&&fresh(btc.atNs,30)&&/(^|-)3dc12870b0a0(-|$)/.test(String(process.release||''));
-  const title=active?'BTC hybrid-budget trial · active':'BTC hybrid-budget trial · adoption unconfirmed';
-  note.textContent=title+'. New contracts keep their first-purchase allowance across maker, taker and hybrid orders; sales do not reset it. Hybrid route estimates account for cash left after the first fill. Probability calibration is unchanged. Latest research: retained BTC snapshots cannot support a continuous book/trade-flow test; that idea remains untested. The jump model remains withheld, and independent USD inputs still need causal receipt data. Improved realized profitability is not established.';
+  const installed=process.running===true&&process.status==='RUNNING'&&fresh(process.heartbeatNs,90)&&fresh(btc.atNs,30)&&/(^|-)81b6c3d3be69(-|$)/.test(String(process.release||''));
+  const now=Date.now(),first=1790758800000,last=1791590400000;
+  const title=!installed?'BTC maker-price trial · adoption unconfirmed':now<first?'BTC maker-price trial · installed, starts September 30 at 09:00 UTC':now>=last?'BTC maker-price trial · expired':'BTC maker-price trial · active';
+  note.textContent=title+'. Eligible closing-hour blocks compare the existing selector with joining the bid or improving it by one tick. Same-side quotes retain existing value checks and cannot exceed incumbent quantity, cost or first-purchase allowance; sales do not reset it. Taker, hybrid and exit rules remain unchanged. The experiment expires October 10 at 00:00 UTC. Probability calibration keeps its October 8–10 schedule. Compare whole-market net dollars, nonfills, fees, credited rebates and unresolved exposure. Improved realized profitability is not established.';
  }
  window.addEventListener('product-cards-rendered',renderBtcValueTrial);
  renderBtcValueTrial();
