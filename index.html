@@ -636,14 +636,14 @@ window.addEventListener('pagehide',()=>statusStream?.close());
  function renderBtcValueTrial(){
   const card=document.querySelector('.product-card[data-product="btc"]');if(!card)return;
   let note=card.querySelector('[data-btc-value-trial]');
-  if(!note){note=document.createElement('section');note.setAttribute('data-btc-value-trial','v89');note.className='product-pnl-note';card.appendChild(note)}
+  if(!note){note=document.createElement('section');note.setAttribute('data-btc-value-trial','v90');note.className='product-pnl-note';card.appendChild(note)}
   const latest=typeof productLatest==='undefined'?null:productLatest;
   const process=latest?.process||{},btc=latest?.btc||{};
   const fresh=(clock,seconds)=>{const age=Date.now()-Number(clock)/1e6;return Number.isFinite(age)&&age>=0&&age<=seconds*1000};
   const stopped=process.status==='STOPPED'||process.status==='HALTED';
   const ready=process.running===true&&process.status==='RUNNING'&&process.phase==='RUNNING'&&fresh(process.heartbeatNs,30)&&fresh(btc.atNs,30);
   const title=stopped?'BTC · trading stopped':ready?'BTC · fresh runtime status':'BTC · current readiness unverified';
-  note.textContent=title+'. '+ "Dated check 2026-10-02 18:52:15 UTC: The existing updater completed handoff to the checked BTC repair. One trader is running and reconciled. The exact source-recovery audit is recorded; newer campaign forecasts remain unverified. Original source failures remain recorded. Trading signals and saved risk are unchanged. Wallet evidence supports testing selective quotes and reducing leftover inventory; it does not reveal a verified entry signal. The Kraken information and separate replenishment tests keep their original dates and data floors. Accounting at 2026-10-02 18:34:19 UTC: 168 accepted orders, 134 filled and 34 accepted nonfills. Known net $-30.56 on $94.52 committed; 26 markets/$53.55 remain unscored. Fees and credited rebates counted once. Profitability remains unproven.";
+  note.textContent=title+'. '+ "Dated check 2026-10-02 19:54:32 UTC: One trader is running and reconciled. The early-market observation repair is installed. New Kraken campaign forecasts are recorded. The settlement reader passed independent synthetic review; the actual market-price comparison starts no earlier than October 5. Trading signals, first-purchase budgets and saved risk are unchanged. Wallet evidence supports testing selective quotes and active inventory management, but provides no verified PMUS entry signal. Accounting at 2026-10-02 19:54:57 UTC: 168 accepted orders, 134 filled and 34 accepted nonfills. Known net $-30.56 on $94.52 committed; 26 markets/$53.55 remain unscored. Fees and credited rebates counted once. Historical gaps and losses remain. Profitability is unproven.";
  }
  window.addEventListener('product-cards-rendered',renderBtcValueTrial);renderBtcValueTrial();
 })();
