@@ -636,14 +636,14 @@ window.addEventListener('pagehide',()=>statusStream?.close());
  function renderBtcValueTrial(){
   const card=document.querySelector('.product-card[data-product="btc"]');if(!card)return;
   let note=card.querySelector('[data-btc-value-trial]');
-  if(!note){note=document.createElement('section');note.setAttribute('data-btc-value-trial','v91');note.className='product-pnl-note';card.appendChild(note)}
+  if(!note){note=document.createElement('section');note.setAttribute('data-btc-value-trial','v92');note.className='product-pnl-note';card.appendChild(note)}
   const latest=typeof productLatest==='undefined'?null:productLatest;
   const process=latest?.process||{},btc=latest?.btc||{};
   const fresh=(clock,seconds)=>{const age=Date.now()-Number(clock)/1e6;return Number.isFinite(age)&&age>=0&&age<=seconds*1000};
   const stopped=process.status==='STOPPED'||process.status==='HALTED';
   const ready=process.running===true&&process.status==='RUNNING'&&process.phase==='RUNNING'&&fresh(process.heartbeatNs,30)&&fresh(btc.atNs,30);
   const title=stopped?'BTC · trading stopped':ready?'BTC · fresh runtime status':'BTC · current readiness unverified';
-  note.textContent=title+'. '+ "Dated check 2026-10-02 20:20:37 UTC: One trader is running and reconciled after an independent Account update; the 15-minute feed is ready and the checked BTC component is unchanged. Stronger-information audit: the one fresh recorded Kraken forecast predicts no index change and lacks a valid Binance comparison. All 60 recorded slower controls lack the required earlier-known index; a separate comparison using the same older index needs feasibility checks. No new trading edge is established. Wallet evidence supports testing selective quotes and managing remaining inventory; budgets and saved risk remain fixed. Accounting at 2026-10-02 20:13:34 UTC: 168 accepted orders, 134 filled and 34 accepted nonfills. Known net $-30.56 on $94.52 committed; 26 markets/$53.55 remain unscored. Fees and credited rebates counted once. Historical gaps and losses remain. Profitability is unproven.";
+  note.textContent=title+'. '+ "Dated check 2026-10-02 20:52:49 UTC: One trader is running and reconciled; both BTC feeds are ready. The proposed trade is selective quoting when fresh BTC information shows value after costs, with existing inventory reductions. A separate timing calculation passed independent code checks; saved recordings cannot establish its edge because earlier receipt evidence is missing. Prospective retention using the existing feed is the next step. Accounting at 2026-10-02 20:39:02 UTC: 168 accepted orders, 134 filled, 34 accepted nonfills. Known net $-30.56 on $94.52 committed; 26 markets/$53.55 remain unscored. Fees and credited rebates are counted once. Saved budgets, risk and original evaluation dates remain. Profitability is unproven.";
  }
  window.addEventListener('product-cards-rendered',renderBtcValueTrial);renderBtcValueTrial();
 })();
