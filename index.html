@@ -636,14 +636,14 @@ window.addEventListener('pagehide',()=>statusStream?.close());
  function renderBtcValueTrial(){
   const card=document.querySelector('.product-card[data-product="btc"]');if(!card)return;
   let note=card.querySelector('[data-btc-value-trial]');
-  if(!note){note=document.createElement('section');note.setAttribute('data-btc-value-trial','v104');note.className='product-pnl-note';card.appendChild(note)}
+  if(!note){note=document.createElement('section');note.setAttribute('data-btc-value-trial','v105');note.className='product-pnl-note';card.appendChild(note)}
   const latest=typeof productLatest==='undefined'?null:productLatest;
   const process=latest?.process||{},btc=latest?.btc||{};
   const fresh=(clock,seconds)=>{const age=Date.now()-Number(clock)/1e6;return Number.isFinite(age)&&age>=0&&age<=seconds*1000};
   const stopped=process.status==='STOPPED'||process.status==='HALTED';
   const ready=process.running===true&&process.status==='RUNNING'&&process.phase==='RUNNING'&&fresh(process.heartbeatNs,30)&&fresh(btc.atNs,30);
   const title=stopped?'BTC · trading stopped':ready?'BTC · fresh runtime status':'BTC · current readiness unverified';
-  note.textContent=title+'. '+ "At 2026-10-03 06:03:49 UTC, Runtime verification: VERIFIED_LIVE_STARTUP_NOT_TRADING_READY. USD research receipts are excluded until successful initialization, with an explicit startup gap. Fresh original source appends are not yet verified. The earlier queue incident remains unattributed; later overflow and sustained coverage remain separate checks. This repair changes source admission and adds no trading signal. Current BTC feed readiness was not verified at this snapshot. Native economics dated 2026-10-03 04:04:09 UTC: 172 accepted orders, 137 filled and 35 accepted nonfills; $5.74 fees, $0.24 credited rebates. Known history: $-24.65 on $132.88 across 83 markets; 5 markets/$18.96 unscored. Purchase-cap subtotal: $-2.25 on $47.51 across 35 changing-policy markets. No open BTC positions, orders or unresolved sends at that dated snapshot. The latest bounded accounting refresh failed; these totals are carried forward. Original evaluation dates, capital/risk limits and Weather/Account compatibility remain. Profitability is unproven.";
+  note.textContent=title+'. '+ "At 2026-10-03 06:23:00 UTC, the checked BTC release was running and reconciled with one owner, and the 15m feed was ready. The startup admission repair is adopted; original forecast records appended after publication. Kraken/Coinbase research coverage remains intermittent, with clock and connection failures; no new qualified common-prior pair is claimed. A repeated full-book copy in the input-update check is being reviewed separately. Current 15m entry is held because external flow opposes the proposed side. Native economics dated 2026-10-03 06:18:09 UTC: 172 accepted orders, 137 filled and 35 accepted nonfills; $5.74 fees and $0.24 credited rebates. Known history: $-24.65 on $132.88 across 83 markets; 5 markets/$18.96 remain unscored. Purchase-cap subtotal: $-2.25 on $47.51 across 35 changing-policy markets. No open BTC positions, orders or unresolved sends at that accounting snapshot. Original evaluation dates and capital/risk limits remain. Profitability is unproven.";
  }
  window.addEventListener('product-cards-rendered',renderBtcValueTrial);renderBtcValueTrial();
 })();
