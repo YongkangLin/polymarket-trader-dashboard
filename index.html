@@ -636,14 +636,14 @@ window.addEventListener('pagehide',()=>statusStream?.close());
  function renderBtcValueTrial(){
   const card=document.querySelector('.product-card[data-product="btc"]');if(!card)return;
   let note=card.querySelector('[data-btc-value-trial]');
-  if(!note){note=document.createElement('section');note.setAttribute('data-btc-value-trial','v116');note.className='product-pnl-note';card.appendChild(note)}
+  if(!note){note=document.createElement('section');note.setAttribute('data-btc-value-trial','v117');note.className='product-pnl-note';card.appendChild(note)}
   const latest=typeof productLatest==='undefined'?null:productLatest;
   const process=latest?.process||{},btc=latest?.btc||{};
   const fresh=(clock,seconds)=>{const age=Date.now()-Number(clock)/1e6;return Number.isFinite(age)&&age>=0&&age<=seconds*1000};
   const stopped=process.status==='STOPPED'||process.status==='HALTED';
   const ready=process.running===true&&process.status==='RUNNING'&&process.phase==='RUNNING'&&fresh(process.heartbeatNs,30)&&fresh(btc.atNs,30);
   const title=stopped?'BTC · trading stopped':ready?'BTC · fresh runtime status':'BTC · current readiness unverified';
-  note.textContent=title+'. '+ "Research remains active. Dated check 2026-10-03 16:39 UTC: trader running and reconciled. At least one current BTC feed was ready. The signed-volatility addition failed on 105,118 historical 2025 observations and was not deployed. Settlement math was independently reproduced; no supported new cancellation rule was found. Accounting at 16:39 UTC: 177 accepted orders, 141 filled and 36 unfilled; $5.94 fees and $0.24 credited rebates. Known results across 86 markets: $-28.17 on $136.40 committed. 6 markets with $19.93 committed remain unscored. The 38 known first-purchase-budget markets total $-5.77 on $51.03; policy changes prevent a controlled comparison. BTC exposure remains open; no open orders or unresolved sends at the snapshot. Original evaluation dates and saved limits remain. Profitability is unproven.";
+  note.textContent=title+'. '+ "Research remains active. Dated check 2026-10-03 17:29 UTC: owner alive and reconciled; strict heartbeat freshness was not met. Full feed readiness was not verified. A 17:30 UTC recheck showed advancing heartbeat/status clocks and a pending Binance window. The new volatility comparison scored 141 matched historical observations; coverage and dates are insufficient for deployment. It improved one forecast score but increased squared error versus the native five-minute estimate; no pricing change was deployed. The earlier signed-volatility addition stays rejected. Accounting at 17:24 UTC: 178 accepted orders, 142 filled, 36 unfilled; $5.98 fees and $0.24 credited rebates. Known results across 88 markets: $-27.08 on $138.31 committed. 5 older markets with $18.96 committed remain unscored. The 40 first-purchase-budget markets total $-4.68 on $52.94; policy changes prevent a controlled comparison. No BTC exposure, open orders or unresolved sends at the account snapshot. Original evaluation dates and saved limits remain. Profitability is unproven.";
  }
  window.addEventListener('product-cards-rendered',renderBtcValueTrial);renderBtcValueTrial();
 })();
