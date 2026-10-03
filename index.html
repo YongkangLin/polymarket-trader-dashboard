@@ -636,14 +636,14 @@ window.addEventListener('pagehide',()=>statusStream?.close());
  function renderBtcValueTrial(){
   const card=document.querySelector('.product-card[data-product="btc"]');if(!card)return;
   let note=card.querySelector('[data-btc-value-trial]');
-  if(!note){note=document.createElement('section');note.setAttribute('data-btc-value-trial','v113');note.className='product-pnl-note';card.appendChild(note)}
+  if(!note){note=document.createElement('section');note.setAttribute('data-btc-value-trial','v114');note.className='product-pnl-note';card.appendChild(note)}
   const latest=typeof productLatest==='undefined'?null:productLatest;
   const process=latest?.process||{},btc=latest?.btc||{};
   const fresh=(clock,seconds)=>{const age=Date.now()-Number(clock)/1e6;return Number.isFinite(age)&&age>=0&&age<=seconds*1000};
   const stopped=process.status==='STOPPED'||process.status==='HALTED';
   const ready=process.running===true&&process.status==='RUNNING'&&process.phase==='RUNNING'&&fresh(process.heartbeatNs,30)&&fresh(btc.atNs,30);
   const title=stopped?'BTC · trading stopped':ready?'BTC · fresh runtime status':'BTC · current readiness unverified';
-  note.textContent=title+'. '+ "BTC checked2026-10-03 12:56UTC: running/reconciled,15M feed READY at snapshot. One identified public wallet trade was available before the frozen12:55 decision; six wallets returned no observations. This proves source presence only, not a predictive signal or profits. The first API-query failure and corrected same-window attempt are retained. USD/Kraken research originals are not continuously advancing; explicit source gaps remain. Existing Kalshi capture startsOctober4, information checksOctober5 and Kalshi fit no earlier thanOctober14. No new trading signal or risk change. Native history unchanged:173 accepted,138 filled,35 nonfills;$5.77 fees,$0.24 credited rebates. Known84 markets:\u2212$25.58 on$133.81;five markets/$18.96 remain unscored. Purchase-cap subtotal:\u2212$3.18 on$48.44 across36 changing-policy markets. No BTC positions/orders/unresolved sends at the separate accounting snapshot. Profitability remains unproven.";
+  note.textContent=title+'. '+ "BTC checked2026-10-03 13:09UTC: running/reconciled,15M feed READY at snapshot. Kraken is an unproved source experiment, not the selected best alpha. Three new Kraken forecasts and one paired quote were saved; original USD coverage did not advance and three new comparable-history records are gaps. Local timeout processing was late; its exact cause is unproved. No guessed source or trading change. Research compares terminal-event prices before asking whether wallet identity adds information after price and anonymous activity. Existing Kalshi capture startsOctober4, information checksOctober5 and Kalshi fit no earlier thanOctober14. Accounting13:12UTC unchanged:173 accepted,138 filled,35 nonfills;$5.77 fees,$0.24 credited rebates. Known84 markets:\u2212$25.58 on$133.81;five markets/$18.96 remain unscored. Purchase-cap subtotal:\u2212$3.18 on$48.44 across36 changing-policy markets. No BTC positions/orders/unresolved sends at that separate accounting snapshot. Profitability remains unproven.";
  }
  window.addEventListener('product-cards-rendered',renderBtcValueTrial);renderBtcValueTrial();
 })();
