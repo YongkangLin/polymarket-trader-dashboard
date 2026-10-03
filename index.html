@@ -636,14 +636,14 @@ window.addEventListener('pagehide',()=>statusStream?.close());
  function renderBtcValueTrial(){
   const card=document.querySelector('.product-card[data-product="btc"]');if(!card)return;
   let note=card.querySelector('[data-btc-value-trial]');
-  if(!note){note=document.createElement('section');note.setAttribute('data-btc-value-trial','v98');note.className='product-pnl-note';card.appendChild(note)}
+  if(!note){note=document.createElement('section');note.setAttribute('data-btc-value-trial','v99');note.className='product-pnl-note';card.appendChild(note)}
   const latest=typeof productLatest==='undefined'?null:productLatest;
   const process=latest?.process||{},btc=latest?.btc||{};
   const fresh=(clock,seconds)=>{const age=Date.now()-Number(clock)/1e6;return Number.isFinite(age)&&age>=0&&age<=seconds*1000};
   const stopped=process.status==='STOPPED'||process.status==='HALTED';
   const ready=process.running===true&&process.status==='RUNNING'&&process.phase==='RUNNING'&&fresh(process.heartbeatNs,30)&&fresh(btc.atNs,30);
   const title=stopped?'BTC · trading stopped':ready?'BTC · fresh runtime status':'BTC · current readiness unverified';
-  note.textContent=title+'. '+ "Dated check 2026-10-03 01:29:45 UTC: The same sole BTC trader is running and reconciled, with a fresh heartbeat and status. The15-minute market lacked an executable book and the hourly entry window was closed; continuous feed reliability remains unproven. Native accounting is readable again:885 proposals,170 accepted orders,136 filled,34 accepted nonfills,$5.63 fees and$0.24 credited rebates, all unchanged. No open BTC positions, orders or unresolved sends at this snapshot. Known history remains-$22.02 on $130.25 across82 markets; five markets/$18.96 remain unscored. All34 purchase-cap markets total+$0.38 on $44.88 after costs, a changing-policy subtotal. The research goal is blocked pending new economic evidence or the original October5 source/PMUS tests; the trader remains running. Later dates, source and risk limits are unchanged. Profitability is unproven.";
+  note.textContent=title+'. '+ "Dated runtime check 2026-10-03 02:31:31 UTC: BTC was running and reconciled, with a fresh heartbeat and a ready15-minute feed. Its flow signal opposed the value side; the hourly entry window was closed. Continuous feed reliability remains unproven. New research tested clock-adjusted volatility on105,118 of105,120 nominal2025 forecasts. It failed the frozen minimum gain, worsened squared error1.89%, and lost to the deliberately shifted control. Independent checks reproduced the rejection; no signal was deployed. Research is active again. Native evidence is unchanged:170 accepted orders,136 filled,34 accepted nonfills,$5.63 fees and$0.24 credited rebates. No open BTC positions, orders or unresolved sends at the accounting snapshot. Known history is-$22.02 on$130.25 across82 markets; five markets/$18.96 remain unscored. The34 purchase-cap markets total+$0.38 on$44.88 after costs, a changing-policy subtotal. Original evaluation dates, capital limits and Weather/Account remain preserved. Profitability is unproven.";
  }
  window.addEventListener('product-cards-rendered',renderBtcValueTrial);renderBtcValueTrial();
 })();
