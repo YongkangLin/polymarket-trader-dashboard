@@ -636,14 +636,14 @@ window.addEventListener('pagehide',()=>statusStream?.close());
  function renderBtcValueTrial(){
   const card=document.querySelector('.product-card[data-product="btc"]');if(!card)return;
   let note=card.querySelector('[data-btc-value-trial]');
-  if(!note){note=document.createElement('section');note.setAttribute('data-btc-value-trial','v94');note.className='product-pnl-note';card.appendChild(note)}
+  if(!note){note=document.createElement('section');note.setAttribute('data-btc-value-trial','v95');note.className='product-pnl-note';card.appendChild(note)}
   const latest=typeof productLatest==='undefined'?null:productLatest;
   const process=latest?.process||{},btc=latest?.btc||{};
   const fresh=(clock,seconds)=>{const age=Date.now()-Number(clock)/1e6;return Number.isFinite(age)&&age>=0&&age<=seconds*1000};
   const stopped=process.status==='STOPPED'||process.status==='HALTED';
   const ready=process.running===true&&process.status==='RUNNING'&&process.phase==='RUNNING'&&fresh(process.heartbeatNs,30)&&fresh(btc.atNs,30);
   const title=stopped?'BTC · trading stopped':ready?'BTC · fresh runtime status':'BTC · current readiness unverified';
-  note.textContent=title+'. '+ "Dated check 2026-10-03 00:34:03 UTC: One BTC trader is running and reconciled with a fresh 15-minute feed. Entries were held for weak supporting external trade flow; the hourly entry window was closed. Accounting at 2026-10-03 00:34:06 UTC: 170 accepted orders, 136 filled, 34 accepted nonfills. Independent native-cash review resolved 21 historical gaps, adding $9.46 of old results; this is not new trading profit. Known history: -$22.02 on $130.25 committed across 82 markets; five markets/$18.96 remain unscored. All 34 markets entered with first-purchase budgets: +$0.38 on $44.88 committed, after actual fees and credited rebates. This small, changing-policy sample does not establish improved alpha. No open BTC inventory, orders or unresolved sends at the snapshot. The original source and PMUS-price diagnostics open October 5 UTC. Calibration dates, capital limits and risk controls remain unchanged. Profitability is unproven.";
+  note.textContent=title+'. '+ "Dated check 2026-10-03 00:52:52 UTC: The same BTC trader is running and reconciled. Earlier checks recorded stale heartbeat/status; both now advance, but BTC feed readiness remains unverified because Binance windows are pending. Heavy host swapping coincided with slow account work; a BTC-only cause is not established. Native trading is unchanged: 170 accepted orders, 136 filled, 34 accepted nonfills; no open BTC positions, orders or unresolved sends at the snapshot. Verified known history remains -$22.02 on $130.25 committed across 82 markets, with five markets/$18.96 unscored. All 34 purchase-cap markets remain +$0.38 on $44.88 after costs. These are historical results, not profit from this diagnosis. Original October5 source/PMUS tests, later calibration dates and risk limits remain. Profitability is unproven.";
  }
  window.addEventListener('product-cards-rendered',renderBtcValueTrial);renderBtcValueTrial();
 })();
