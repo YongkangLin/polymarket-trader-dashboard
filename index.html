@@ -636,14 +636,14 @@ window.addEventListener('pagehide',()=>statusStream?.close());
  function renderBtcValueTrial(){
   const card=document.querySelector('.product-card[data-product="btc"]');if(!card)return;
   let note=card.querySelector('[data-btc-value-trial]');
-  if(!note){note=document.createElement('section');note.setAttribute('data-btc-value-trial','v110');note.className='product-pnl-note';card.appendChild(note)}
+  if(!note){note=document.createElement('section');note.setAttribute('data-btc-value-trial','v111');note.className='product-pnl-note';card.appendChild(note)}
   const latest=typeof productLatest==='undefined'?null:productLatest;
   const process=latest?.process||{},btc=latest?.btc||{};
   const fresh=(clock,seconds)=>{const age=Date.now()-Number(clock)/1e6;return Number.isFinite(age)&&age>=0&&age<=seconds*1000};
   const stopped=process.status==='STOPPED'||process.status==='HALTED';
   const ready=process.running===true&&process.status==='RUNNING'&&process.phase==='RUNNING'&&fresh(process.heartbeatNs,30)&&fresh(btc.atNs,30);
   const title=stopped?'BTC · trading stopped':ready?'BTC · fresh runtime status':'BTC · current readiness unverified';
-  note.textContent=title+'. '+ "BTC runtime checked at 2026-10-03 10:57:07 UTC. The bounded Kalshi observer is installed and initialized. First scheduled collection is October4 UTC. Kalshi is an unproved information candidate; Kraken is not an established winner. Matched PMUS prices/fees, actual BRTI/Binance forecasts and genuinely delayed Kalshi quotes are retained for comparison. Live source timing and coverage remain unqualified; no trading signal changed. Original campaigns and evaluation dates remain. Native economics at 2026-10-03 10:52:39 UTC:173 accepted orders,138filled,35 accepted nonfills; $5.77 fees,$0.24 credited rebates. Known history:\u2212$25.58 on$133.81 across84 markets;5 markets/$18.96 remain unscored. Latest newly recorded market:\u2212$0.93 after fees. Purchase-cap subtotal:\u2212$3.18 on$48.44 across36 changing-policy markets. No BTC positions/orders/unresolved sends at that separate accounting snapshot. Capital and risk limits remain. Profitability is unproven.";
+  note.textContent=title+'. '+ "BTC runtime checked at 2026-10-03 12:10:40 UTC. Trader running and reconciled; recorder restart repair adopted and Kalshi observer initialized. First Kalshi collection is October4 UTC. The comparison code is checked and frozen: test Kalshi against PMUS prices, the current BRTI/Binance forecast and delayed quotes, then assess actual PMUS costs. Live collection timing and coverage remain unqualified. No trading signal changed and no source has established superiority. Next existing information evaluation: October5; Kalshi fit: October14. Original campaign dates and support requirements remain. Native economics at 2026-10-03 12:02:04 UTC: 173 accepted orders,138 filled,35 accepted nonfills; $5.77 fees,$0.24 credited rebates. Known history:\u2212$25.58 on$133.81 across84 markets;5 markets/$18.96 remain unscored. Purchase-cap subtotal:\u2212$3.18 on$48.44 across36 changing-policy markets. No BTC positions/orders/unresolved sends at that separate accounting snapshot. Capital and risk limits remain. Profitability is unproven.";
  }
  window.addEventListener('product-cards-rendered',renderBtcValueTrial);renderBtcValueTrial();
 })();
